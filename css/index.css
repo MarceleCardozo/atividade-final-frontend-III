@@ -26,10 +26,25 @@
   width: 100%;
 }
 
-/* Imagem de fundo em telas grandes */
-@media (min-width: 992px) {
-  #background-ricky-and-morty {
-    height: 100%;
-    width: 100%;
-  }
+footer {
+  position: fixed;
+  background-color: rgb(25, 32, 25);
+  color: gainsboro;
+  font-size: 10px;
+  font-family: sans-serif;
+  height: 16vh;
+  width: 100%;
+}
+
+.footer-list {
+  list-style-type: none;
+  color: rgb(73, 231, 73);
+}
+
+#copyright {
+  color: rgb(73, 231, 73);
+}
+
+#copyright b {
+  color: white;
 }
