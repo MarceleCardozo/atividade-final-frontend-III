@@ -1,5 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap");
 
+* {
+  padding: 0px;
+  margin: 0px;
+}
+
 /* Título da API */
 .api-title {
   width: 100%;
@@ -13,4 +18,18 @@
 .search-button {
   color: rgb(8, 92, 8);
   margin-left: -50px;
+}
+
+/* Imagem de fundo */
+#background-ricky-and-morty {
+  height: 60vh;
+  width: 100%;
+}
+
+/* Imagem de fundo em telas grandes */
+@media (min-width: 992px) {
+  #background-ricky-and-morty {
+    height: 100%;
+    width: 100%;
+  }
 }
