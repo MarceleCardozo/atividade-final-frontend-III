@@ -21,7 +21,11 @@
 }
 
 /* Imagem de fundo */
-#background-ricky-and-morty {
+main {
+  background: url(../images/FUNDO_2.jpg) center bottom/cover no-repeat;
+}
+
+main {
   height: 60vh;
   width: 100%;
 }
