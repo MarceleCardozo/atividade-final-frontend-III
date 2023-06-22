@@ -30,6 +30,14 @@ main {
   width: 100%;
 }
 
+.card h5 {
+  font-family: "Roboto", sans-serif;
+}
+
+.card p {
+  font-size: 12px;
+}
+
 footer {
   position: fixed;
   background-color: rgb(25, 32, 25);
