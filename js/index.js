@@ -6,10 +6,16 @@ let totalCharacters = 0;
 let totalPages = 0;
 const cardsPerPage = 6;
 let currentPage = 1;
+let searchQuery = "";
 
 async function showCharactersOnScreen() {
   try {
-    const characterResponse = await api.get("/character");
+    let characterResponse;
+    if (searchQuery) {
+      characterResponse = await api.get(`/character?name=${searchQuery}`);
+    } else {
+      characterResponse = await api.get("/character");
+    }
     const characters = characterResponse.data.results;
 
     totalCharacters = characters.length;
@@ -33,7 +39,6 @@ async function showCharactersOnScreen() {
       } else {
         statusColorClass = "gray-status";
       }
-
       const card = document.createElement("div");
       card.classList.add("col-4");
 
@@ -59,6 +64,9 @@ async function showCharactersOnScreen() {
       `;
 
       card.innerHTML = cardContent;
+      card.addEventListener("click", () => {
+        showCharacterDetails(character);
+      });
       cards.appendChild(card);
     });
 
@@ -119,4 +127,34 @@ function createPageButton(label, enabled) {
   return button;
 }
 
-document.addEventListener("DOMContentLoaded", showCharactersOnScreen);
+function showCharacterDetails(character) {
+  const modalTitle = document.querySelector("#modalTitle");
+  const modalBody = document.querySelector("#modalBody");
+
+  modalTitle.textContent = character.name;
+  modalBody.innerHTML = `
+    <p>Status: ${character.status}</p>
+    <p>Species: ${character.species}</p>
+    <p>Last Known Location: ${character.location.name}</p>
+    <p>Last Seen on: ${character.episode[character.episode.length - 1]}</p>
+  `;
+
+  const characterModal = new bootstrap.Modal(
+    document.querySelector("#characterModal")
+  );
+  characterModal.show();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const searchForm = document.querySelector("form");
+  const searchInput = document.querySelector("input[type=search]");
+
+  searchForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    searchQuery = searchInput.value.trim();
+    currentPage = 1;
+    showCharactersOnScreen();
+  });
+
+  showCharactersOnScreen();
+});
