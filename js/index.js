@@ -2,46 +2,121 @@ const api = axios.create({
   baseURL: "https://rickandmortyapi.com/api",
 });
 
-async function showCharactersOnScreen(ev) {
-  ev.preventDefault();
+let totalCharacters = 0;
+let totalPages = 0;
+const cardsPerPage = 6;
+let currentPage = 1;
 
+async function showCharactersOnScreen() {
   try {
-    const characterResponse = await api.get(
-      "https://rickandmortyapi.com/api/character"
-    );
-
+    const characterResponse = await api.get("/character");
     const characters = characterResponse.data.results;
 
+    totalCharacters = characters.length;
+    totalPages = Math.ceil(totalCharacters / cardsPerPage);
+
     const cards = document.querySelector("#container-cards");
+    cards.innerHTML = "";
 
-    console.log(characters);
+    let statusColorClass = "";
 
-    characters.forEach((character) => {
-      cards.innerHTML += `
-      <div class="col-4 p-2">
-        <div class="card border-info mt-5"" style="width: 14rem;">
-        <img src="https://rickandmortyapi.com/api/character/avatar/${character.id}.jpeg"/>
+    const startIndex = (currentPage - 1) * cardsPerPage;
+    const endIndex = startIndex + cardsPerPage;
+
+    const charactersToShow = characters.slice(startIndex, endIndex);
+
+    charactersToShow.forEach((character) => {
+      if (character.status === "Alive") {
+        statusColorClass = "green-status";
+      } else if (character.status === "Dead") {
+        statusColorClass = "red-status";
+      } else {
+        statusColorClass = "gray-status";
+      }
+
+      const card = document.createElement("div");
+      card.classList.add("col-4");
+
+      const cardContent = `
+        <div class="card border-info mt-3" style="width: 10rem; height: 13.5rem">
+          <img src="${character.image}" />
           <div class="card-body">
             <h5 class="card-title">${character.name}</h5>
-            <p>
-            ${character.status} - ${character.species}
-            </p>
-            <p class="card-text ">
-            Last known location:
-            <br>
-            <span>${character.location.name}</span>
+            <div class="statusWrapper">
+              <div class="statusColor ${statusColorClass}"></div>
+              <p>${character.status} - ${character.species}</p>
+            </div>
+            <p class="card-text">
+              Last known location:<br>
+              <span>${character.location.name}</span>
             </p>
             <p class="card-text">
-            Last seen on:
-            <span></span>
+              Last seen on:
+              <span></span>
             </p>
           </div>
         </div>
-      </div>`;
+      `;
+
+      card.innerHTML = cardContent;
+      cards.appendChild(card);
     });
+
+    updatePagination();
   } catch (error) {
     console.log(error);
   }
+}
+
+function updatePagination() {
+  const pagination = document.querySelector(".pagination");
+  pagination.innerHTML = "";
+
+  const previousButton = createPageButton("Previous", currentPage > 1);
+  previousButton.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      showCharactersOnScreen();
+    }
+  });
+  pagination.appendChild(previousButton);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const pageButton = createPageButton(i, currentPage !== i);
+    pageButton.addEventListener("click", () => {
+      if (currentPage !== i) {
+        currentPage = i;
+        showCharactersOnScreen();
+      }
+    });
+    pagination.appendChild(pageButton);
+  }
+
+  const nextButton = createPageButton("Next", currentPage < totalPages);
+  nextButton.addEventListener("click", () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      showCharactersOnScreen();
+    }
+  });
+  pagination.appendChild(nextButton);
+}
+
+function createPageButton(label, enabled) {
+  const button = document.createElement("li");
+  button.classList.add("page-item");
+  if (!enabled) {
+    button.classList.add("disabled");
+  }
+
+  const link = document.createElement("a");
+  link.classList.add("page-link");
+  link.href = "#";
+  link.innerHTML = label;
+
+  button.appendChild(link);
+
+  return button;
 }
 
 document.addEventListener("DOMContentLoaded", showCharactersOnScreen);

@@ -5,7 +5,6 @@
   margin: 0px;
 }
 
-/* Título da API */
 .api-title {
   width: 100%;
   color: rgb(8, 92, 8);
@@ -14,13 +13,11 @@
   font-size: 50px;
 }
 
-/* Estilização do botão de pesquisa */
 .search-button {
   color: rgb(8, 92, 8);
   margin-left: -50px;
 }
 
-/* Imagem de fundo */
 main {
   background: url(../images/FUNDO_2.jpg) center bottom/cover no-repeat;
 }
@@ -30,12 +27,49 @@ main {
   width: 100%;
 }
 
+.card {
+  color: white;
+  --bs-card-bg: transparent;
+}
+
+.card img {
+  height: 120px;
+  width: 158px;
+}
+
 .card h5 {
   font-family: "Roboto", sans-serif;
+  font-size: 11px;
+  margin-bottom: 0;
 }
 
 .card p {
-  font-size: 12px;
+  font-size: 7px;
+  margin: 0;
+}
+
+.statusWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.statusColor {
+  width: 5px;
+  height: 5px;
+  border-radius: 100%;
+  margin-right: 5px;
+}
+
+.green-status {
+  background-color: #56cd42;
+}
+
+.red-status {
+  background-color: #cd4242;
+}
+
+.gray-status {
+  background-color: #bbbbbb;
 }
 
 footer {
@@ -44,7 +78,7 @@ footer {
   color: gainsboro;
   font-size: 10px;
   font-family: sans-serif;
-  height: 16vh;
+  height: 100%;
   width: 100%;
 }
 
@@ -59,4 +93,16 @@ footer {
 
 #copyright b {
   color: white;
+}
+
+.container,
+.container-md,
+.container-sm {
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 580px;
+  }
 }
