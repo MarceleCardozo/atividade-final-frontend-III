@@ -133,6 +133,7 @@ function showCharacterDetails(character) {
 
   modalTitle.textContent = character.name;
   modalBody.innerHTML = `
+    <img src="${character.image}" />
     <p>Status: ${character.status}</p>
     <p>Species: ${character.species}</p>
     <p>Last Known Location: ${character.location.name}</p>
