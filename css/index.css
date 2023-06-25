@@ -18,7 +18,7 @@
 }
 
 #logo-rick-and-morty {
-  animation: flip 2s linear infinite;
+  animation: flip 2s cubic-bezier(0.42, 0, 0.58, 1) infinite;
   transform-style: preserve-3d;
 }
 
@@ -61,7 +61,7 @@ main {
   color: white;
   --bs-card-bg: transparent;
   opacity: 0;
-  animation: fadeIn 0.5s forwards;
+  animation: fadeIn 0.5s cubic-bezier(0.42, 0, 0.58, 1) forwards;
   width: 10rem;
   height: 13.5rem;
 }
