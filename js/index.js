@@ -10,15 +10,24 @@ let searchQuery = "";
 async function showCharactersOnScreen() {
   try {
     let characterResponse;
+
+    console.log(currentPage);
+
     if (searchQuery) {
-      characterResponse = await api.get(`/character?name=${searchQuery}`);
+      characterResponse = await api.get(
+        `/character?name=${searchQuery}&page=${currentPage}`
+      );
     } else {
-      characterResponse = await api.get("/character");
+      characterResponse = await api.get(`/character?page=${currentPage}`);
     }
     const characters = characterResponse.data.results;
+    console.log(characters);
+
     const amountOfCharacters = characterResponse.data.info.count;
+    console.log(amountOfCharacters);
 
     totalPages = Math.ceil(amountOfCharacters / cardsPerPage);
+    console.log(totalPages);
 
     updateTotalCharacters(amountOfCharacters);
     updateTotalLocations();
@@ -31,7 +40,7 @@ async function showCharactersOnScreen() {
 
     for (let i = 0; i < charactersToShow.length; i++) {
       const character = charactersToShow[i];
-      const card = await createCharacterCard(character); // Aguarda a criação do cartão
+      const card = await createCharacterCard(character);
       card.addEventListener("click", () => {
         showCharacterDetails(character);
       });
@@ -103,7 +112,7 @@ async function createCharacterCard(character) {
   card.classList.add("col-4");
 
   const cardContent = `
-    <div class="card border-success mt-4" style="width: 10rem; height: 13.5rem">
+    <div class="card border-success mt-4">
       <img src="${character.image}" />
       <div class="card-body">
         <h5 class="card-title">${character.name}</h5>
@@ -111,9 +120,9 @@ async function createCharacterCard(character) {
           <div class="statusColor ${statusColorClass}"></div>
           <p>${character.status} - ${character.species}</p>
         </div>
-        <p class="card-text">Last known location:</p>
+        <p class="card-text mt-1">Last known location:</p>
         <p>${character.location.name}</p>
-        <p class="card-text">Last seen on:</p>
+        <p class="card-text mt-1">Last seen on:</p>
         <p>${lastEpisodeName}</p>
       </div>
     </div>
@@ -177,7 +186,7 @@ async function showCharacterDetails(character) {
 
   modalBody.innerHTML = `
     <img src="${character.image}" /> 
-    <p>Status: ${character.status}</p> 
+    <p class="mt-3">Status: ${character.status}</p> 
     <p>Species: ${character.species}</p> 
     <p>Last Known Location: ${character.location.name}</p> 
     <p>Last Seen on: ${lastEpisodeName}</p>
