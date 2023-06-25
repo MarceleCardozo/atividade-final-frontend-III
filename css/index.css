@@ -53,7 +53,7 @@ main {
 }
 
 main {
-  height: 60vh;
+  height: 65vh;
   width: 100%;
 }
 
@@ -91,6 +91,15 @@ main {
   margin: 0;
 }
 
+.card-text {
+  color: #6c757d;
+}
+
+.card span {
+  font-size: 7px;
+  margin: 0;
+}
+
 .statusWrapper {
   display: flex;
   align-items: center;
@@ -115,11 +124,61 @@ main {
   background-color: #bbbbbb;
 }
 
+.pagination {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  z-index: 999;
+}
+
+.page-item .page-link {
+  color: #28a745;
+  background-color: #fff;
+  border-color: #28a745;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.page-item.disabled .page-link:hover {
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.page-link:hover {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.page-link:focus {
+  box-shadow: none;
+}
+
+.footer-list {
+  justify-content: center;
+}
+
+#characters,
+#locations,
+#episodes {
+  color: #28a745;
+}
+
 footer {
   position: fixed;
-  background-color: rgb(25, 32, 25);
+  background-color: rgb(17, 21, 17);
   color: gainsboro;
-  font-size: 10px;
+  font-size: 8px;
   font-family: sans-serif;
   height: 100%;
   width: 100%;
@@ -128,6 +187,12 @@ footer {
 .footer-list {
   list-style-type: none;
   color: rgb(73, 231, 73);
+}
+
+#totalCharacters,
+#totalLocations,
+#totalEpisodes {
+  color: #bbbbbb;
 }
 
 #copyright {

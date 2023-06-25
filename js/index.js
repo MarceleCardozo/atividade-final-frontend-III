@@ -17,53 +17,21 @@ async function showCharactersOnScreen() {
       characterResponse = await api.get("/character");
     }
     const characters = characterResponse.data.results;
+    const qtdPersonagens = characterResponse.data.info.count;
 
-    totalCharacters = characters.length;
-    totalPages = Math.ceil(totalCharacters / cardsPerPage);
+    totalPages = Math.ceil(qtdPersonagens / cardsPerPage);
+
+    updateTotalCharacters(qtdPersonagens);
+    updateTotalLocations();
+    updateTotalEpisodes();
 
     const cards = document.querySelector("#container-cards");
     cards.innerHTML = "";
 
-    let statusColorClass = "";
-
-    const startIndex = (currentPage - 1) * cardsPerPage;
-    const endIndex = startIndex + cardsPerPage;
-
-    const charactersToShow = characters.slice(startIndex, endIndex);
+    const charactersToShow = getCharactersToShow(characters);
 
     charactersToShow.forEach((character) => {
-      if (character.status === "Alive") {
-        statusColorClass = "green-status";
-      } else if (character.status === "Dead") {
-        statusColorClass = "red-status";
-      } else {
-        statusColorClass = "gray-status";
-      }
-      const card = document.createElement("div");
-      card.classList.add("col-4");
-
-      const cardContent = `
-        <div class="card border-info mt-3" style="width: 10rem; height: 13.5rem">
-          <img src="${character.image}" />
-          <div class="card-body">
-            <h5 class="card-title">${character.name}</h5>
-            <div class="statusWrapper">
-              <div class="statusColor ${statusColorClass}"></div>
-              <p>${character.status} - ${character.species}</p>
-            </div>
-            <p class="card-text">
-              Last known location:<br>
-              <span>${character.location.name}</span>
-            </p>
-            <p class="card-text">
-              Last seen on:
-              <span></span>
-            </p>
-          </div>
-        </div>
-      `;
-
-      card.innerHTML = cardContent;
+      const card = createCharacterCard(character);
       card.addEventListener("click", () => {
         showCharacterDetails(character);
       });
@@ -74,6 +42,69 @@ async function showCharactersOnScreen() {
   } catch (error) {
     console.log(error);
   }
+}
+
+function updateTotalCharacters(totalCharacters) {
+  const totalCharactersElement = document.querySelector("#totalCharacters");
+  totalCharactersElement.textContent = totalCharacters;
+}
+
+async function updateTotalLocations() {
+  const locationResponse = await api.get("/location");
+  const totalLocations = locationResponse.data.info.count;
+
+  const totalLocationsElement = document.querySelector("#totalLocations");
+  totalLocationsElement.textContent = totalLocations;
+}
+
+async function updateTotalEpisodes() {
+  const episodeResponse = await api.get("/episode");
+  const totalEpisodes = episodeResponse.data.info.count;
+
+  const totalEpisodesElement = document.querySelector("#totalEpisodes");
+  totalEpisodesElement.textContent = totalEpisodes;
+}
+
+function getCharactersToShow(characters) {
+  const startIndex = (currentPage - 1) * cardsPerPage;
+  const endIndex = startIndex + cardsPerPage;
+
+  return characters.slice(startIndex, endIndex);
+}
+
+function createCharacterCard(character) {
+  let statusColorClass = "";
+
+  if (character.status === "Alive") {
+    statusColorClass = "green-status";
+  } else if (character.status === "Dead") {
+    statusColorClass = "red-status";
+  } else {
+    statusColorClass = "gray-status";
+  }
+
+  const card = document.createElement("div");
+  card.classList.add("col-4");
+
+  const cardContent = `
+    <div class="card border-info mt-4" style="width: 10rem; height: 13.5rem">
+      <img src="${character.image}" />
+      <div class="card-body">
+        <h5 class="card-title">${character.name}</h5>
+        <div class="statusWrapper">
+          <div class="statusColor ${statusColorClass}"></div>
+          <p>${character.status} - ${character.species}</p>
+        </div>
+        <p class="card-text">Last known location:</p>
+        <p>${character.location.name}</p>
+        <p class="card-text">Last seen on:</p>
+        <p></p>
+      </div>
+    </div>
+  `;
+
+  card.innerHTML = cardContent;
+  return card;
 }
 
 function updatePagination() {
@@ -89,16 +120,8 @@ function updatePagination() {
   });
   pagination.appendChild(previousButton);
 
-  for (let i = 1; i <= totalPages; i++) {
-    const pageButton = createPageButton(i, currentPage !== i);
-    pageButton.addEventListener("click", () => {
-      if (currentPage !== i) {
-        currentPage = i;
-        showCharactersOnScreen();
-      }
-    });
-    pagination.appendChild(pageButton);
-  }
+  const pageButton = createPageButton(currentPage, false);
+  pagination.appendChild(pageButton);
 
   const nextButton = createPageButton("Next", currentPage < totalPages);
   nextButton.addEventListener("click", () => {
@@ -133,12 +156,11 @@ function showCharacterDetails(character) {
 
   modalTitle.textContent = character.name;
   modalBody.innerHTML = `
-    <img src="${character.image}" />
-    <p>Status: ${character.status}</p>
-    <p>Species: ${character.species}</p>
-    <p>Last Known Location: ${character.location.name}</p>
-    <p>Last Seen on: ${character.episode[character.episode.length - 1]}</p>
-  `;
+  <img src="${character.image}" /> 
+  <p>Status: ${character.status}</p> 
+  <p>Species: ${character.species}</p> 
+  <p>Last Known Location: ${character.location.name}</p> 
+  <p>Last Seen on: ${character.episode[character.episode.length - 1]}</p>`;
 
   const characterModal = new bootstrap.Modal(
     document.querySelector("#characterModal")
