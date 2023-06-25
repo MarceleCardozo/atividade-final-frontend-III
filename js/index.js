@@ -2,7 +2,6 @@ const api = axios.create({
   baseURL: "https://rickandmortyapi.com/api",
 });
 
-let totalCharacters = 0;
 let totalPages = 0;
 const cardsPerPage = 6;
 let currentPage = 1;
@@ -17,26 +16,27 @@ async function showCharactersOnScreen() {
       characterResponse = await api.get("/character");
     }
     const characters = characterResponse.data.results;
-    const qtdPersonagens = characterResponse.data.info.count;
+    const amountOfCharacters = characterResponse.data.info.count;
 
-    totalPages = Math.ceil(qtdPersonagens / cardsPerPage);
+    totalPages = Math.ceil(amountOfCharacters / cardsPerPage);
 
-    updateTotalCharacters(qtdPersonagens);
+    updateTotalCharacters(amountOfCharacters);
     updateTotalLocations();
     updateTotalEpisodes();
+
+    const charactersToShow = getCharactersToShow(characters);
 
     const cards = document.querySelector("#container-cards");
     cards.innerHTML = "";
 
-    const charactersToShow = getCharactersToShow(characters);
-
-    charactersToShow.forEach((character) => {
-      const card = createCharacterCard(character);
+    for (let i = 0; i < charactersToShow.length; i++) {
+      const character = charactersToShow[i];
+      const card = await createCharacterCard(character); // Aguarda a criação do cartão
       card.addEventListener("click", () => {
         showCharacterDetails(character);
       });
       cards.appendChild(card);
-    });
+    }
 
     updatePagination();
   } catch (error) {
@@ -72,7 +72,7 @@ function getCharactersToShow(characters) {
   return characters.slice(startIndex, endIndex);
 }
 
-function createCharacterCard(character) {
+async function createCharacterCard(character) {
   let statusColorClass = "";
 
   if (character.status === "Alive") {
@@ -83,11 +83,27 @@ function createCharacterCard(character) {
     statusColorClass = "gray-status";
   }
 
+  const getLastEpisodeName = async () => {
+    try {
+      const lastEpisodeId = character.episode[character.episode.length - 1]
+        .split("/")
+        .pop();
+      const episodeResponse = await api.get(`/episode/${lastEpisodeId}`);
+      const lastEpisodeName = episodeResponse.data.name;
+      return lastEpisodeName;
+    } catch (error) {
+      console.log(error);
+      return "Unknown Episode";
+    }
+  };
+
+  const lastEpisodeName = await getLastEpisodeName();
+
   const card = document.createElement("div");
   card.classList.add("col-4");
 
   const cardContent = `
-    <div class="card border-info mt-4" style="width: 10rem; height: 13.5rem">
+    <div class="card border-success mt-4" style="width: 10rem; height: 13.5rem">
       <img src="${character.image}" />
       <div class="card-body">
         <h5 class="card-title">${character.name}</h5>
@@ -98,7 +114,7 @@ function createCharacterCard(character) {
         <p class="card-text">Last known location:</p>
         <p>${character.location.name}</p>
         <p class="card-text">Last seen on:</p>
-        <p></p>
+        <p>${lastEpisodeName}</p>
       </div>
     </div>
   `;
@@ -119,9 +135,6 @@ function updatePagination() {
     }
   });
   pagination.appendChild(previousButton);
-
-  const pageButton = createPageButton(currentPage, false);
-  pagination.appendChild(pageButton);
 
   const nextButton = createPageButton("Next", currentPage < totalPages);
   nextButton.addEventListener("click", () => {
@@ -150,17 +163,25 @@ function createPageButton(label, enabled) {
   return button;
 }
 
-function showCharacterDetails(character) {
+async function showCharacterDetails(character) {
   const modalTitle = document.querySelector("#modalTitle");
   const modalBody = document.querySelector("#modalBody");
 
   modalTitle.textContent = character.name;
+
+  const lastEpisodeId = character.episode[character.episode.length - 1]
+    .split("/")
+    .pop();
+  const episodeResponse = await api.get(`/episode/${lastEpisodeId}`);
+  const lastEpisodeName = episodeResponse.data.name;
+
   modalBody.innerHTML = `
-  <img src="${character.image}" /> 
-  <p>Status: ${character.status}</p> 
-  <p>Species: ${character.species}</p> 
-  <p>Last Known Location: ${character.location.name}</p> 
-  <p>Last Seen on: ${character.episode[character.episode.length - 1]}</p>`;
+    <img src="${character.image}" /> 
+    <p>Status: ${character.status}</p> 
+    <p>Species: ${character.species}</p> 
+    <p>Last Known Location: ${character.location.name}</p> 
+    <p>Last Seen on: ${lastEpisodeName}</p>
+  `;
 
   const characterModal = new bootstrap.Modal(
     document.querySelector("#characterModal")
