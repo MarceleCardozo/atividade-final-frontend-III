@@ -134,6 +134,7 @@ main {
   display: flex;
   justify-content: center;
   z-index: 999;
+  bottom: 20%;
 }
 
 .page-item .page-link {
