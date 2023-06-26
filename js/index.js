@@ -6,28 +6,44 @@ let totalPages = 0;
 const cardsPerPage = 6;
 let currentPage = 1;
 let searchQuery = "";
+let charactersList = [];
+let count;
+let routeParameter = 1;
+let isResetCharactersList;
+
+async function buscarPersonagens() {
+  try {
+    if (searchQuery) {
+      result = await api.get(`/character?name=${searchQuery}`);
+      charactersList = [];
+      isResetCharactersList = true;
+      result.data.results.forEach((list) => charactersList.push(list));
+    } else {
+      if (isResetCharactersList) {
+        isResetCharactersList = false;
+        charactersList = [];
+        routeParameter = 1;
+      }
+      result = await api.get(`/character?page=${routeParameter}`);
+      routeParameter++;
+      result.data.results.forEach((list) => charactersList.push(list));
+      count = result.data.info.count;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 async function showCharactersOnScreen() {
   try {
-    let characterResponse;
+    await buscarPersonagens();
+    const characters = charactersList;
 
-    console.log(currentPage);
+    const amountOfCharacters = count;
 
-    if (searchQuery) {
-      characterResponse = await api.get(
-        `/character?name=${searchQuery}&page=${currentPage}`
-      );
-    } else {
-      characterResponse = await api.get(`/character?page=${currentPage}`);
-    }
-    const characters = characterResponse.data.results;
-    console.log(characters);
-
-    const amountOfCharacters = characterResponse.data.info.count;
-    console.log(amountOfCharacters);
-
-    totalPages = Math.ceil(amountOfCharacters / cardsPerPage);
-    console.log(totalPages);
+    totalPages = searchQuery
+      ? Math.ceil(characters.length / cardsPerPage)
+      : Math.ceil(amountOfCharacters / cardsPerPage);
 
     updateTotalCharacters(amountOfCharacters);
     updateTotalLocations();
